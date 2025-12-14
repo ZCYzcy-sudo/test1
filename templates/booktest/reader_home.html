@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知阅 - 在线阅读平台</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    
+    <!-- 配置Tailwind主题 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // 主色调：靛蓝色
+                        secondary: '#7C3AED', // 辅助色：紫色
+                        accent: '#F97316', // 强调色：橙色
+                        neutral: {
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            300: '#CBD5E1',
+                            400: '#94A3B8',
+                            500: '#64748B',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1E293B',
+                            900: '#0F172A',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Merriweather', 'Georgia', 'serif'],
+                    },
+                },
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .book-card-hover {
+                @apply hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out;
+            }
+            .category-pill-active {
+                @apply bg-primary text-white;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+        }
+    </style>
+    
+    <!-- 引入Google字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-neutral-50 font-sans text-neutral-800">
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-50 bg-white shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-book text-primary text-2xl"></i>
+                    <span class="font-bold text-xl text-neutral-800">知阅</span>
+                </div>
+                
+                <!-- 搜索框 - 仅在中等及以上屏幕显示 -->
+                <div class="hidden md:flex items-center flex-1 max-w-xl mx-8">
+                    <div class="relative w-full">
+                        <input type="text" 
+                               placeholder="搜索书籍、作者或分类..." 
+                               class="w-full pl-10 pr-4 py-2 rounded-full border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                        >
+                        <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"></i>
+                    </div>
+                </div>
+                
+                <!-- 用户菜单 -->
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 rounded-full hover:bg-neutral-100 transition-colors">
+                        <i class="fa fa-bell-o text-neutral-600"></i>
+                    </button>
+                    <button class="p-2 rounded-full hover:bg-neutral-100 transition-colors">
+                        <i class="fa fa-bookmark-o text-neutral-600"></i>
+                    </button>
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 p-1 rounded-full hover:bg-neutral-100 transition-colors">
+                            <img src="https://picsum.photos/200/200?random=user" alt="用户头像" class="w-8 h-8 rounded-full object-cover">
+                            <i class="fa fa-angle-down text-neutral-600 group-hover:rotate-180 transition-transform"></i>
+                        </button>
+                        <!-- 用户下拉菜单 -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-50">
+                            <div class="p-3 border-b border-neutral-100">
+                                <p class="font-medium text-neutral-800">{{ user.username|default:'访客' }}</p>
+                                <p class="text-sm text-neutral-500">{{ user.email|default:'未登录' }}</p>
+                            </div>
+                            <a href="#" class="block px-4 py-2 hover:bg-neutral-100 text-neutral-700 transition-colors">
+                                <i class="fa fa-user-o mr-2"></i> 个人中心
+                            </a>
+                            <a href="#" class="block px-4 py-2 hover:bg-neutral-100 text-neutral-700 transition-colors">
+                                <i class="fa fa-bookmark-o mr-2"></i> 我的书架
+                            </a>
+                            <a href="#" class="block px-4 py-2 hover:bg-neutral-100 text-neutral-700 transition-colors">
+                                <i class="fa fa-history mr-2"></i> 阅读历史
+                            </a>
+                            <a href="#" class="block px-4 py-2 hover:bg-neutral-100 text-neutral-700 transition-colors">
+                                <i class="fa fa-cog mr-2"></i> 设置
+                            </a>
+                            <a href="/logout" class="block px-4 py-2 hover:bg-neutral-100 text-danger transition-colors">
+                                <i class="fa fa-sign-out mr-2"></i> 退出登录
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 搜索框 - 仅在小屏幕显示 -->
+            <div class="md:hidden pb-4">
+                <div class="relative w-full">
+                    <input type="text" 
+                           placeholder="搜索书籍..." 
+                           class="w-full pl-10 pr-4 py-2 rounded-full border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    >
+                    <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 欢迎信息 -->
+        <section class="mb-10">
+            <div class="bg-gradient-to-r from-primary/90 to-secondary/90 rounded-2xl p-6 md:p-8 text-white shadow-lg">
+                <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-2">欢迎来到知阅</h1>
+                <p class="text-white/90 text-lg max-w-2xl mb-6">发现、阅读和收藏你喜爱的书籍，开启知识的探索之旅</p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#discover" class="bg-white text-primary hover:bg-white/90 font-medium px-6 py-3 rounded-full transition-colors inline-flex items-center">
+                        <i class="fa fa-compass mr-2"></i> 开始探索
+                    </a>
+                    <a href="#recommended" class="bg-white/20 text-white hover:bg-white/30 font-medium px-6 py-3 rounded-full transition-colors inline-flex items-center">
+                        <i class="fa fa-star-o mr-2"></i> 推荐书籍
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 分类导航 -->
+        <section id="categories" class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-neutral-800">探索分类</h2>
+                <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center transition-colors">
+                    查看全部 <i class="fa fa-angle-right ml-1"></i>
+                </a>
+            </div>
+            
+            <div class="overflow-x-auto scrollbar-hide -mx-4 px-4">
+                <div class="flex space-x-3 pb-4 min-w-max">
+                    <button class="category-pill-active px-5 py-2 rounded-full text-sm font-medium transition-colors">
+                        全部
+                    </button>
+                    <button class="bg-neutral-100 hover:bg-neutral-200 px-5 py-2 rounded-full text-sm font-medium text-neutral-700 transition-colors">
+                        文学小说
+                    </button>
+                    <button class="bg-neutral-100 hover:bg-neutral-200 px-5 py-2 rounded-full text-sm font-medium text-neutral-700 transition-colors">
+                        历史传记
+                    </button>
+                    <button class="bg-neutral-100 hover:bg-neutral-200 px-5 py-2 rounded-full text-sm font-medium text-neutral-700 transition-colors">
+                        科学技术
+                    </button>
+                    <button class="bg-neutral-100 hover:bg-neutral-200 px-5 py-2 rounded-full text-sm font-medium text-neutral-700 transition-colors">
+                        哲学心理
+                    </button>
+                    <button class="bg-neutral-100 hover:bg-neutral-200 px-5 py-2 rounded-full text-sm font-medium text-neutral-700 transition-colors">
+                        经济管理
+                    </button>
+                    <button class="bg-neutral-100 hover:bg-neutral-200 px-5 py-2 rounded-full text-sm font-medium text-neutral-700 transition-colors">
+                        生活艺术
+                    </button>
+                    <button class="bg-neutral-100 hover:bg-neutral-200 px-5 py-2 rounded-full text-sm font-medium text-neutral-700 transition-colors">
+                        教育学习
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 推荐书籍 -->
+        <section id="recommended" class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-neutral-800">为你推荐</h2>
+                <div class="flex space-x-2">
+                    <button id="prevRecommended" class="p-2 rounded-full border border-neutral-200 hover:bg-neutral-100 text-neutral-600 transition-colors">
+                        <i class="fa fa-angle-left"></i>
+                    </button>
+                    <button id="nextRecommended" class="p-2 rounded-full border border-neutral-200 hover:bg-neutral-100 text-neutral-600 transition-colors">
+                        <i class="fa fa-angle-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                <!-- 书籍卡片 1 -->
+                <div class="book-card-hover bg-white rounded-lg overflow-hidden shadow">
+                    <div class="relative">
+                        <img src="https://picsum.photos/400/600?random=1" alt="书籍封面" class="w-full aspect-[2/3] object-cover">
+                        <button class="absolute top-2 right-2 bg-white/80 hover:bg-white text-primary p-2 rounded-full transition-colors">
+                            <i class="fa fa-bookmark-o"></i>
+                        </button>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-neutral-800 line-clamp-1 mb-1">人类简史</h3>
+                        <p class="text-sm text-neutral-500 line-clamp-1 mb-2">尤瓦尔·赫拉利</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-accent">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star-half-o"></i>
+                                <span class="text-xs text-neutral-500 ml-1">4.5</span>
+                            </div>
+                            <span class="text-xs text-neutral-500">2011</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 书籍卡片 2 -->
+                <div class="book-card-hover bg-white rounded-lg overflow-hidden shadow">
+                    <div class="relative">
+                        <img src="https://picsum.photos/400/600?random=2" alt="书籍封面" class="w-full aspect-[2/3] object-cover">
+                        <button class="absolute top-2 right-2 bg-white/80 hover:bg-white text-primary p-2 rounded-full transition-colors">
+                            <i class="fa fa-bookmark-o"></i>
+                        </button>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-neutral-800 line-clamp-1 mb-1">三体</h3>
+                        <p class="text-sm text-neutral-500 line-clamp-1 mb-2">刘慈欣</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-accent">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <span class="text-xs text-neutral-500 ml-1">4.9</span>
+                            </div>
+                            <span class="text-xs text-neutral-500">2008</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 书籍卡片 3 -->
+                <div class="book-card-hover bg-white rounded-lg overflow-hidden shadow">
+                    <div class="relative">
+                        <img src="https://picsum.photos/400/600?random=3" alt="书籍封面" class="w-full aspect-[2/3] object-cover">
+                        <button class="absolute top-2 right-2 bg-white/80 hover:bg-white text-primary p-2 rounded-full transition-colors">
+                            <i class="fa fa-bookmark-o"></i>
+                        </button>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-neutral-800 line-clamp-1 mb-1">活着</h3>
+                        <p class="text-sm text-neutral-500 line-clamp-1 mb-2">余华</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-accent">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star-o"></i>
+                                <span class="text-xs text-neutral-500 ml-1">4.2</span>
+                            </div>
+                            <span class="text-xs text-neutral-500">1993</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 书籍卡片 4 -->
+                <div class="book-card-hover bg-white rounded-lg overflow-hidden shadow">
+                    <div class="relative">
+                        <img src="https://picsum.photos/400/600?random=4" alt="书籍封面" class="w-full aspect-[2/3] object-cover">
+                        <button class="absolute top-2 right-2 bg-white/80 hover:bg-white text-primary p-2 rounded-full transition-colors">
+                            <i class="fa fa-bookmark-o"></i>
+                        </button>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-neutral-800 line-clamp-1 mb-1">百年孤独</h3>
+                        <p class="text-sm text-neutral-500 line-clamp-1 mb-2">加西亚·马尔克斯</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-accent">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star-half-o"></i>
+                                <span class="text-xs text-neutral-500 ml-1">4.7</span>
+                            </div>
+                            <span class="text-xs text-neutral-500">1967</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 书籍卡片 5 -->
+                <div class="book-card-hover bg-white rounded-lg overflow-hidden shadow">
+                    <div class="relative">
+                        <img src="https://picsum.photos/400/600?random=5" alt="书籍封面" class="w-full aspect-[2/3] object-cover">
+                        <button class="absolute top-2 right-2 bg-white/80 hover:bg-white text-primary p-2 rounded-full transition-colors">
+                            <i class="fa fa-bookmark-o"></i>
+                        </button>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-neutral-800 line-clamp-1 mb-1">解忧杂货店</h3>
+                        <p class="text-sm text-neutral-500 line-clamp-1 mb-2">东野圭吾</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-accent">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star-o"></i>
+                                <span class="text-xs text-neutral-500 ml-1">4.3</span>
+                            </div>
+                            <span class="text-xs text-neutral-500">2012</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 书籍卡片 6 -->
+                <div class="book-card-hover bg-white rounded-lg overflow-hidden shadow">
+                    <div class="relative">
+                        <img src="https://picsum.photos/400/600?random=6" alt="书籍封面" class="w-full aspect-[2/3] object-cover">
+                        <button class="absolute top-2 right-2 bg-white/80 hover:bg-white text-primary p-2 rounded-full transition-colors">
+                            <i class="fa fa-bookmark-o"></i>
+                        </button>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-neutral-800 line-clamp-1 mb-1">围城</h3>
+                        <p class="text-sm text-neutral-500 line-clamp-1 mb-2">钱钟书</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-accent">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star-o"></i>
+                                <span class="text-xs text-neutral-500 ml-1">4.4</span>
+                            </div>
+                            <span class="text-xs text-neutral-500">1947</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 热门阅读 -->
+        <section id="trending" class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-neutral-800">热门阅读</h2>
+                <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center transition-colors">
+                    查看全部 <i class="fa fa-angle-right ml-1"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 热门书籍 1 -->
+                <div class="book-card-hover bg-white rounded-lg overflow-hidden shadow flex flex-col sm:flex-row">
+                    <img src="https://picsum.photos/300/400?random=10" alt="书籍封面" class="w-full sm:w-1/3 aspect-[2/3] sm:aspect-auto object-cover">
+                    <div class="p-4 sm:w-2/3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg text-neutral-800 mb-1">我们仨</h3>
+                            <p class="text-sm text-neutral-500 mb-3">杨绛</p>
+                            <p class="text-sm text-neutral-600 line-clamp-3 mb-4">这是一部充满温情和回忆的散文随笔，作者以简洁而沉重的语言，回忆了先后离她而去的女儿钱瑗、丈夫钱钟书，以及一家三口那些快乐而艰难、爱与痛的日子...</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-accent">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star-half-o"></i>
+                                <span class="text-xs text-neutral-500 ml-1">4.8</span>
+                            </div>
+                            <span class="text-xs text-neutral-500">32.5万人在读</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 热门书籍 2 -->
+                <div class="book-card-hover bg-white rounded-lg overflow-hidden shadow flex flex-col sm:flex-row">
+                    <img src="https://picsum.photos/300/400?random=11" alt="书籍封面" class="w-full sm:w-1/3 aspect-[2/3] sm:aspect-auto object-cover">
+                    <div class="p-4 sm:w-2/3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg text-neutral-800 mb-1">追风筝的人</h3>
+                            <p class="text-sm text-neutral-500 mb-3">卡勒德·胡赛尼</p>
+                            <p class="text-sm text-neutral-600 line-clamp-3 mb-4">12岁的阿富汗富家少爷阿米尔与他父亲仆人儿子哈桑之间的友情故事，作者以温暖细腻的笔法勾勒人性的本质与救赎，读来令人荡气回肠...</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-accent">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star-o"></i>
+                                <span class="text-xs text-neutral-500 ml-1">4.6</span>
+                            </div>
+                            <span class="text-xs text-neutral-500">28.3万人在读</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 热门书籍 3 -->
+                <div class="book-card-hover bg-white rounded-lg overflow-hidden shadow flex flex-col sm:flex-row">
+                    <img src="https://picsum.photos/300/400?random=12" alt="书籍封面" class="w-full sm:w-1/3 aspect-[2/3] sm:aspect-auto object-cover">
+                    <div class="p-4 sm:w-2/3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg text-neutral-800 mb-1">小王子</h3>
+                            <p class="text-sm text-neutral-500 mb-3">安托万·德·圣埃克苏佩里</p>
+                            <p class="text-sm text-neutral-600 line-clamp-3 mb-4">这是一部献给所有的孩子和曾经是孩子的大人的童话，讲述了小王子从自己星球出发前往地球的过程中，所经历的各种历险和感悟...</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-accent">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <span class="text-xs text-neutral-500 ml-1">4.9</span>
+                            </div>
+                            <span class="text-xs text-neutral-500">41.2万人在读</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最近更新 -->
+        <section id="updates" class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-neutral-800">最近更新</h2>
+                <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center transition-colors">
+                    查看全部 <i class="fa fa-angle-right ml-1"></i>
+                </a>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="border-b border-neutral-200">
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-neutral-600">书名</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-neutral-600">作者</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-neutral-600">分类</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-neutral-600">更新时间</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-neutral-600">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
+                                <td class="py-3 px-4 text-sm text-neutral-800">沉默的大多数</td>
+                                <td class="py-3 px-4 text-sm text-neutral-600">王小波</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <span class="bg-neutral-100 text-neutral-600 px-2 py-1 rounded text-xs">散文随笔</span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-neutral-500">今天 09:32</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <a href="#" class="text-primary hover:text-primary/80 transition-colors">阅读</a>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
+                                <td class="py-3 px-4 text-sm text-neutral-800">乡土中国</td>
+                                <td class="py-3 px-4 text-sm text-neutral-600">费孝通</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <span class="bg-neutral-100 text-neutral-600 px-2 py-1 rounded text-xs">社会学</span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-neutral-500">今天 08:15</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <a href="#" class="text-primary hover:text-primary/80 transition-colors">阅读</a>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
+                                <td class="py-3 px-4 text-sm text-neutral-800">月亮与六便士</td>
+                                <td class="py-3 px-4 text-sm text-neutral-600">毛姆</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <span class="bg-neutral-100 text-neutral-600 px-2 py-1 rounded text-xs">文学小说</span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-neutral-500">昨天 22:47</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <a href="#" class="text-primary hover:text-primary/80 transition-colors">阅读</a>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
+                                <td class="py-3 px-4 text-sm text-neutral-800">心理学与生活</td>
+                                <td class="py-3 px-4 text-sm text-neutral-600">理查德·格里格</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <span class="bg-neutral-100 text-neutral-600 px-2 py-1 rounded text-xs">心理学</span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-neutral-500">昨天 20:12</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <a href="#" class="text-primary hover:text-primary/80 transition-colors">阅读</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-neutral-50 transition-colors">
+                                <td class="py-3 px-4 text-sm text-neutral-800">原则</td>
+                                <td class="py-3 px-4 text-sm text-neutral-600">雷·达里奥</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <span class="bg-neutral-100 text-neutral-600 px-2 py-1 rounded text-xs">个人成长</span>
+                                </td>
+                                <td class="py-3 px-4 text-sm text-neutral-500">昨天 16:38</td>
+                                <td class="py-3 px-4 text-sm">
+                                    <a href="#" class="text-primary hover:text-primary/80 transition-colors">阅读</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 阅读统计 -->
+        <section id="statistics" class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-neutral-800">阅读统计</h2>
+                <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center transition-colors">
+                    详细报告 <i class="fa fa-angle-right ml-1"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 统计卡片 1 -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-neutral-800">本周阅读</h3>
+                        <span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs font-medium">+12%</span>
+                    </div>
+                    <div class="flex items-end space-x-2">
+                        <span class="text-4xl font-bold text-neutral-800">18.5</span>
+                        <span class="text-neutral-500 mb-1">小时</span>
+                    </div>
+                    <div class="mt-4 h-1 bg-neutral-100 rounded-full overflow-hidden">
+                        <div class="bg-primary h-full rounded-full" style="width: 65%"></div>
+                    </div>
+                    <p class="text-sm text-neutral-500 mt-2">目标: 25小时 (65%)</p>
+                </div>
+                
+                <!-- 统计卡片 2 -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-neutral-800">本月读完</h3>
+                        <span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs font-medium">+3本</span>
+                    </div>
+                    <div class="flex items-end space-x-2">
+                        <span class="text-4xl font-bold text-neutral-800">7</span>
+                        <span class="text-neutral-500 mb-1">本</span>
+                    </div>
+                    <div class="mt-4 h-1 bg-neutral-100 rounded-full overflow-hidden">
+                        <div class="bg-secondary h-full rounded-full" style="width: 70%"></div>
+                    </div>
+                    <p class="text-sm text-neutral-500 mt-2">目标: 10本 (70%)</p>
+                </div>
+                
+                <!-- 统计卡片 3 -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-neutral-800">今年累计</h3>
+                        <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">继续保持</span>
+                    </div>
+                    <div class="flex items-end space-x-2">
+                        <span class="text-4xl font-bold text-neutral-800">42</span>
+                        <span class="text-neutral-500 mb-1">本</span>
+                    </div>
+                    <div class="mt-4 h-1 bg-neutral-100 rounded-full overflow-hidden">
+                        <div class="bg-accent h-full rounded-full" style="width: 56%"></div>
+                    </div>
+                    <p class="text-sm text-neutral-500 mt-2">目标: 75本 (56%)</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-neutral-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- 关于我们 -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-book text-primary text-2xl"></i>
+                        <span class="font-bold text-xl">知阅</span>
+                    </div>
+                    <p class="text-neutral-400 text-sm mb-4">知阅是一个致力于提供优质阅读体验的在线阅读平台，让知识触手可及。</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 快速链接 -->
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">快速链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors text-sm">首页</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors text-sm">分类浏览</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors text-sm">热门推荐</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors text-sm">新书上架</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors text-sm">阅读活动</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 帮助中心 -->
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">帮助中心</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors text-sm">常见问题</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors text-sm">用户指南</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors text-sm">联系我们</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors text-sm">意见反馈</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors text-sm">隐私政策</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 订阅更新 -->
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">订阅更新</h3>
+                    <p class="text-neutral-400 text-sm mb-4">订阅我们的电子邮件，获取最新书籍和活动信息。</p>
+                    <div class="flex">
+                        <input type="email" placeholder="您的邮箱地址" class="px-4 py-2 rounded-l-lg focus:outline-none text-neutral-800 flex-1">
+                        <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-r-lg transition-colors">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-neutral-700 mt-8 pt-8 text-center text-neutral-500 text-sm">
+                <p>© 2023 知阅 All Rights Reserved. 沪ICP备12345678号</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 页面滚动效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // 顶部导航栏滚动效果
+            const header = document.querySelector('header');
+            let lastScrollTop = 0;
+            
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop > 100) {
+                    header.classList.add('shadow-md');
+                    header.classList.add('bg-white/95');
+                    header.classList.add('backdrop-blur-sm');
+                } else {
+                    header.classList.remove('shadow-md');
+                    header.classList.remove('bg-white/95');
+                    header.classList.remove('backdrop-blur-sm');
+                }
+                
+                lastScrollTop = scrollTop;
+            });
+            
+            // 分类切换
+            const categoryButtons = document.querySelectorAll('#categories button');
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    categoryButtons.forEach(btn => {
+                        btn.classList.remove('category-pill-active');
+                        btn.classList.add('bg-neutral-100', 'hover:bg-neutral-200', 'text-neutral-700');
+                    });
+                    
+                    this.classList.add('category-pill-active');
+                    this.classList.remove('bg-neutral-100', 'hover:bg-neutral-200', 'text-neutral-700');
+                    
+                    // 这里可以添加分类筛选逻辑
+                });
+            });
+            
+            // 推荐书籍轮播控制
+            const prevBtn = document.getElementById('prevRecommended');
+            const nextBtn = document.getElementById('nextRecommended');
+            
+            if (prevBtn && nextBtn) {
+                prevBtn.addEventListener('click', function() {
+                    // 这里可以添加轮播逻辑
+                    console.log('Previous slide');
+                });
+                
+                nextBtn.addEventListener('click', function() {
+                    // 这里可以添加轮播逻辑
+                    console.log('Next slide');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
