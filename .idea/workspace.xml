@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d4d62c4b-632c-4c28-a056-2f90c256d48d" name="更改" comment="登录验证：验证用户名和密码是否正确&#10;设备授权：检查当前设备MAC地址是否已授权&#10;授权日期检查：验证系统当前时间是否在授权有效期内&#10;系统时间验证：防止通过修改系统时间绕过授权限制&#10;无操作超时检测：用户长时间无操作时弹出警告窗口，超时后强制登出&#10;登出功能：支持用户主动登出和强制登出&#10;窗口关闭确认：已登录状态下关闭窗口时显示确认提示&#10;数据库初始化：自动创建所需表并插入默认数据&#10;通过本次开发，成功实现了一个功能完整的授权登录系统，并解决了开发过程中遇到的各种技术问题，包括布局管理、事件处理、数据库连接和错误调试等">
+      <change beforePath="$PROJECT_DIR$/test1UI.py" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/-" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/-" />
+    <option name="ROOT_SYNC" value="SYNC" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ZCYzcy-sudo&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ZCYzcy-sudo/test1.git&quot;,
+    &quot;accountId&quot;: &quot;af97d66b-8087-4d43-828e-a8b1a643f479&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="36pXuGF9VdXshDTgaVvfelZdVBP" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.app.executor": "Run",
+    "Python.test1UI.executor": "Run",
+    "Python.测试数据库连接.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "D:/PycharmProjects/test1",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  }
+}]]></component>
+  <component name="RunManager" selected="Python.main">
+    <configuration name="测试数据库连接" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="test1" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/测试数据库连接.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="test1" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.测试数据库连接" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-14705d77f0bb-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.25659.43" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="d4d62c4b-632c-4c28-a056-2f90c256d48d" name="更改" comment="" />
+      <created>1765704707567</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1765704707567</updated>
+    </task>
+    <task id="LOCAL-00001" summary="登录验证：验证用户名和密码是否正确&#10;设备授权：检查当前设备MAC地址是否已授权&#10;授权日期检查：验证系统当前时间是否在授权有效期内&#10;系统时间验证：防止通过修改系统时间绕过授权限制&#10;无操作超时检测：用户长时间无操作时弹出警告窗口，超时后强制登出&#10;登出功能：支持用户主动登出和强制登出&#10;窗口关闭确认：已登录状态下关闭窗口时显示确认提示&#10;数据库初始化：自动创建所需表并插入默认数据&#10;通过本次开发，成功实现了一个功能完整的授权登录系统，并解决了开发过程中遇到的各种技术问题，包括布局管理、事件处理、数据库连接和错误调试等">
+      <option name="closed" value="true" />
+      <created>1765872390829</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1765872390829</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="登录验证：验证用户名和密码是否正确&#10;设备授权：检查当前设备MAC地址是否已授权&#10;授权日期检查：验证系统当前时间是否在授权有效期内&#10;系统时间验证：防止通过修改系统时间绕过授权限制&#10;无操作超时检测：用户长时间无操作时弹出警告窗口，超时后强制登出&#10;登出功能：支持用户主动登出和强制登出&#10;窗口关闭确认：已登录状态下关闭窗口时显示确认提示&#10;数据库初始化：自动创建所需表并插入默认数据&#10;通过本次开发，成功实现了一个功能完整的授权登录系统，并解决了开发过程中遇到的各种技术问题，包括布局管理、事件处理、数据库连接和错误调试等" />
+    <option name="LAST_COMMIT_MESSAGE" value="登录验证：验证用户名和密码是否正确&#10;设备授权：检查当前设备MAC地址是否已授权&#10;授权日期检查：验证系统当前时间是否在授权有效期内&#10;系统时间验证：防止通过修改系统时间绕过授权限制&#10;无操作超时检测：用户长时间无操作时弹出警告窗口，超时后强制登出&#10;登出功能：支持用户主动登出和强制登出&#10;窗口关闭确认：已登录状态下关闭窗口时显示确认提示&#10;数据库初始化：自动创建所需表并插入默认数据&#10;通过本次开发，成功实现了一个功能完整的授权登录系统，并解决了开发过程中遇到的各种技术问题，包括布局管理、事件处理、数据库连接和错误调试等" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>8</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
